@@ -53,7 +53,7 @@ class MainActivity : Activity() {
 
     private fun buildHome(): View {
         val root = FrameLayout(this).apply {
-            background = verticalGradient(Color.rgb(7, 20, 42), Color.rgb(20, 52, 79))
+            background = GradientDrawable(GradientDrawable.Orientation.TL_BR, intArrayOf(Color.rgb(4, 10, 24), Color.rgb(10, 31, 55), Color.rgb(5, 15, 31)))
             applySystemBarInsets(this)
         }
         val scroll = ScrollView(this).apply { isFillViewport = true; clipToPadding = false }
@@ -74,9 +74,9 @@ class MainActivity : Activity() {
             gravity = Gravity.CENTER
             letterSpacing = 0.08f
             setPadding(dp(16), dp(3), dp(16), dp(3))
-            background = pillGradient(Color.rgb(255, 154, 38), Color.rgb(238, 59, 26), Color.rgb(255, 205, 92))
+            background = neonPill(Color.rgb(0, 125, 174), Color.rgb(0, 224, 255))
             elevation = dp(7).toFloat()
-            setShadowLayer(dp(8).toFloat(), 0f, dp(3).toFloat(), Color.rgb(255, 92, 27))
+            setShadowLayer(dp(8).toFloat(), 0f, 0f, Color.rgb(0, 183, 255))
         }
         column.addView(banner, LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, dp(36)))
         column.addView(space(24))
@@ -131,7 +131,7 @@ class MainActivity : Activity() {
             orientation = LinearLayout.VERTICAL
             gravity = Gravity.CENTER
             setPadding(dp(7), dp(7), dp(7), dp(7))
-            background = layeredCard(darkAccent, brightAccent, accent)
+            background = esportsCard(darkAccent, if (isRonaldo) Color.rgb(255, 55, 91) else Color.rgb(0, 224, 255))
             elevation = dp(8).toFloat()
             isClickable = true
             isFocusable = true
@@ -150,7 +150,8 @@ class MainActivity : Activity() {
             if (imageId != 0) {
                 addView(ImageView(this@MainActivity).apply {
                     setImageResource(imageId)
-                    scaleType = ImageView.ScaleType.FIT_CENTER
+                    scaleType = ImageView.ScaleType.CENTER_CROP
+                    adjustViewBounds = false
                     contentDescription = "$name portrait"
                 }, FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT))
             }
@@ -395,7 +396,7 @@ class MainActivity : Activity() {
         isAllCaps = false
         gravity = Gravity.CENTER
         letterSpacing = 0.035f
-        background = pillGradient(Color.rgb(255, 157, 40), Color.rgb(231, 58, 28), Color.rgb(255, 205, 92))
+        background = neonPill(Color.rgb(0, 125, 174), Color.rgb(0, 224, 255))
         elevation = dp(7).toFloat()
         setShadowLayer(dp(5).toFloat(), 0f, dp(3).toFloat(), Color.rgb(0, 0, 0))
         setPadding(dp(12), 0, dp(12), 0)
@@ -430,6 +431,10 @@ class MainActivity : Activity() {
         cornerRadius = dp(13).toFloat()
         setStroke(dp(1), if (isRedPlayer) Color.rgb(104, 255, 177) else Color.rgb(112, 238, 255))
     }
+
+    private fun neonPill(fill: Int, glow: Int) = GradientDrawable(GradientDrawable.Orientation.TOP_BOTTOM, intArrayOf(fill, Color.rgb((Color.red(fill) * 0.72f).toInt(), (Color.green(fill) * 0.72f).toInt(), (Color.blue(fill) * 0.72f).toInt()))).apply { cornerRadius = dp(13).toFloat(); setStroke(dp(1), glow) }
+
+    private fun esportsCard(fill: Int, glow: Int) = GradientDrawable(GradientDrawable.Orientation.TL_BR, intArrayOf(Color.rgb(19, 43, 67), fill, Color.rgb(5, 12, 25))).apply { cornerRadius = dp(15).toFloat(); setStroke(dp(1), glow) }
 
     private fun darken(color: Int, factor: Float): Int = Color.rgb(
         (Color.red(color) * factor).toInt().coerceIn(0, 255),
