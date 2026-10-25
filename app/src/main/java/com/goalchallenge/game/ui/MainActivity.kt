@@ -6,6 +6,8 @@ import android.content.Intent
 import android.graphics.Color
 import android.graphics.Typeface
 import android.graphics.drawable.GradientDrawable
+import android.graphics.drawable.LayerDrawable
+import android.view.MotionEvent
 import android.os.Build
 import android.os.Bundle
 import android.view.Gravity
@@ -104,7 +106,7 @@ class MainActivity : Activity() {
         column.addView(text("C H A L L E N G E", 19f, Color.WHITE, true).apply {
             gravity = Gravity.CENTER
             letterSpacing = 0.06f
-            background = neonPill(Color.rgb(11, 47, 103), Color.rgb(0, 196, 255))
+            background = threeDButton(Color.rgb(11, 47, 103), Color.rgb(0, 196, 255))
             setPadding(dp(16), dp(4), dp(16), dp(4))
             elevation = dp(5).toFloat()
         }, LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, dp(36)))
@@ -137,7 +139,7 @@ class MainActivity : Activity() {
             startActivity(Intent(this, GameActivity::class.java))
         }.apply {
             textSize = 25f
-            background = neonPill(Color.rgb(21, 224, 45), Color.rgb(181, 255, 94))
+            background = threeDButton(Color.rgb(21, 224, 45), Color.rgb(181, 255, 94))
             setTextColor(Color.WHITE)
             setShadowLayer(dp(7).toFloat(), 0f, dp(2).toFloat(), Color.rgb(0, 255, 55))
         }, LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, dp(68)))
@@ -152,13 +154,13 @@ class MainActivity : Activity() {
             showPlayers()
         }.apply {
             textSize = 17f
-            background = neonPill(Color.rgb(0, 111, 255), Color.rgb(91, 224, 255))
+            background = threeDButton(Color.rgb(0, 111, 255), Color.rgb(91, 224, 255))
         }, LinearLayout.LayoutParams(0, dp(58), 1f).apply { marginEnd = dp(6) })
         secondary.addView(menuButton("⚙  SETTINGS") {
             showSettings()
         }.apply {
             textSize = 17f
-            background = neonPill(Color.rgb(15, 37, 76), Color.rgb(0, 196, 255))
+            background = threeDButton(Color.rgb(15, 37, 76), Color.rgb(0, 196, 255))
         }, LinearLayout.LayoutParams(0, dp(58), 1f).apply { marginStart = dp(6) })
         column.addView(secondary, LinearLayout.LayoutParams(
             ViewGroup.LayoutParams.MATCH_PARENT, dp(58)
@@ -170,7 +172,7 @@ class MainActivity : Activity() {
             gravity = Gravity.CENTER
             typeface = Typeface.DEFAULT_BOLD
             setTextColor(Color.WHITE)
-            background = neonPill(Color.rgb(0, 79, 143), Color.rgb(0, 220, 255))
+            background = threeDButton(Color.rgb(0, 79, 143), Color.rgb(0, 220, 255), 3)
             elevation = dp(6).toFloat()
             setOnClickListener { showHowToPlay() }
             contentDescription = "How to play"
@@ -189,7 +191,7 @@ class MainActivity : Activity() {
             orientation = LinearLayout.VERTICAL
             gravity = Gravity.CENTER
             setPadding(dp(7), dp(7), dp(7), dp(7))
-            background = esportsCard(darkAccent, if (isRonaldo) Color.rgb(255, 55, 91) else Color.rgb(0, 224, 255))
+            background = threeDPanel(darkAccent, if (isRonaldo) Color.rgb(255, 55, 91) else Color.rgb(0, 224, 255))
             elevation = dp(8).toFloat()
             isClickable = true
             isFocusable = true
@@ -460,6 +462,19 @@ class MainActivity : Activity() {
         setShadowLayer(dp(5).toFloat(), 0f, dp(3).toFloat(), Color.rgb(0, 0, 0))
         setPadding(dp(12), 0, dp(12), 0)
         setOnClickListener { onClick() }
+        setOnTouchListener { view, event ->
+            when (event.actionMasked) {
+                MotionEvent.ACTION_DOWN -> {
+                    view.translationY = dp(3).toFloat()
+                    view.elevation = dp(2).toFloat()
+                }
+                MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
+                    view.translationY = 0f
+                    view.elevation = dp(7).toFloat()
+                }
+            }
+            false
+        }
         minHeight = dp(50)
         stateListAnimator = null
     }.also { it.layoutParams = LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, dp(50)) }
@@ -491,9 +506,50 @@ class MainActivity : Activity() {
         setStroke(dp(1), if (isRedPlayer) Color.rgb(104, 255, 177) else Color.rgb(112, 238, 255))
     }
 
-    private fun neonPill(fill: Int, glow: Int) = GradientDrawable(GradientDrawable.Orientation.TOP_BOTTOM, intArrayOf(fill, Color.rgb((Color.red(fill) * 0.72f).toInt(), (Color.green(fill) * 0.72f).toInt(), (Color.blue(fill) * 0.72f).toInt()))).apply { cornerRadius = dp(13).toFloat(); setStroke(dp(1), glow) }
+    /** Layered face + exposed lower base makes buttons look like raised arcade controls. */
+    private fun threeDButton(fill: Int, glow: Int, depthDp: Int = 5): LayerDrawable {
+        val baseColor = darken(fill, 0.40f)
+        val base = GradientDrawable(
+            GradientDrawable.Orientation.TOP_BOTTOM,
+            intArrayOf(darken(baseColor, 0.72f), baseColor)
+        ).apply {
+            cornerRadius = dp(15).toFloat()
+            setStroke(dp(1), darken(glow, 0.55f))
+        }
+        val face = GradientDrawable(
+            GradientDrawable.Orientation.TOP_BOTTOM,
+            intArrayOf(lighten(fill, 0.28f), fill, darken(fill, 0.34f))
+        ).apply {
+            cornerRadius = dp(14).toFloat()
+            setStroke(dp(2), glow)
+        }
+        return LayerDrawable(arrayOf(base, face)).apply {
+            setLayerInset(0, 0, dp(3), 0, 0)
+            setLayerInset(1, 0, 0, 0, dp(depthDp))
+        }
+    }
 
-    private fun esportsCard(fill: Int, glow: Int) = GradientDrawable(GradientDrawable.Orientation.TL_BR, intArrayOf(Color.rgb(19, 43, 67), fill, Color.rgb(5, 12, 25))).apply { cornerRadius = dp(15).toFloat(); setStroke(dp(1), glow) }
+    /** Player panels use a raised lower edge and neon outline too. */
+    private fun threeDPanel(fill: Int, glow: Int): LayerDrawable {
+        val base = GradientDrawable(
+            GradientDrawable.Orientation.TOP_BOTTOM,
+            intArrayOf(Color.rgb(1, 8, 22), Color.rgb(0, 25, 48))
+        ).apply {
+            cornerRadius = dp(17).toFloat()
+            setStroke(dp(1), darken(glow, 0.48f))
+        }
+        val face = GradientDrawable(
+            GradientDrawable.Orientation.TL_BR,
+            intArrayOf(Color.rgb(28, 57, 91), fill, Color.rgb(5, 12, 25))
+        ).apply {
+            cornerRadius = dp(15).toFloat()
+            setStroke(dp(2), glow)
+        }
+        return LayerDrawable(arrayOf(base, face)).apply {
+            setLayerInset(0, 0, dp(4), 0, 0)
+            setLayerInset(1, 0, 0, 0, dp(4))
+        }
+    }
 
     private fun darken(color: Int, factor: Float): Int = Color.rgb(
         (Color.red(color) * factor).toInt().coerceIn(0, 255),
