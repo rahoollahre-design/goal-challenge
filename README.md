@@ -43,6 +43,10 @@ You can also run it from a terminal:
 
 To create the desktop shortcut for the current checkout, run `./install-desktop-shortcut.sh` once. Then double-click **Goal Challenge - Build and Install** from the Desktop.
 
+### Keyboard shortcut (Ubuntu GNOME)
+
+Run `./install-keyboard-shortcut.sh` once from the repository folder. It registers **Ctrl+Alt+B** to run the same build-and-install workflow as the desktop shortcut. Pressing the shortcut runs tests, builds the debug APK, installs it on exactly one authorized connected Android device, and launches the game. Keep the phone unlocked with USB debugging enabled and approve the debugging prompt. This keyboard shortcut installer is for Ubuntu's GNOME desktop; the desktop launcher remains available as an alternative.
+
 The included `gradlew.bat` is a portable bootstrap that downloads Gradle 9.6.0 on first use. This avoids shipping an opaque wrapper JAR in this generated archive.
 
 For a conventional repository setup, run `SETUP_STANDARD_GRADLE_WRAPPER.bat` once on your Windows machine with internet access. It generates the official Gradle Wrapper JAR/scripts for Gradle 9.6.0.
