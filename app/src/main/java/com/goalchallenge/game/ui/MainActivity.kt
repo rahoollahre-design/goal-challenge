@@ -457,7 +457,7 @@ class MainActivity : Activity() {
         isAllCaps = false
         gravity = Gravity.CENTER
         letterSpacing = 0.035f
-        background = neonPill(Color.rgb(0, 125, 174), Color.rgb(0, 224, 255))
+        background = threeDButton(Color.rgb(0, 125, 174), Color.rgb(0, 224, 255))
         elevation = dp(7).toFloat()
         setShadowLayer(dp(5).toFloat(), 0f, dp(3).toFloat(), Color.rgb(0, 0, 0))
         setPadding(dp(12), 0, dp(12), 0)
@@ -523,7 +523,7 @@ class MainActivity : Activity() {
             cornerRadius = dp(14).toFloat()
             setStroke(dp(2), glow)
         }
-        return LayerDrawable(arrayOf(base, face)).apply {
+        return LayerDrawable(arrayOf<android.graphics.drawable.Drawable>(base, face)).apply {
             setLayerInset(0, 0, dp(3), 0, 0)
             setLayerInset(1, 0, 0, 0, dp(depthDp))
         }
