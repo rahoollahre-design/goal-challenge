@@ -27,7 +27,8 @@ gsettings list-relocatable-schemas | grep -qx 'org.gnome.settings-daemon.plugins
 CURRENT="$(gsettings get org.gnome.settings-daemon.plugins.media-keys custom-keybindings)"
 python3 - "$CURRENT" "$BINDING_PATH" <<'PY' > /tmp/goal-challenge-keybindings.txt
 import ast, sys
-items = ast.literal_eval(sys.argv[1])
+raw = sys.argv[1].strip()
+items = [] if raw == '@as []' else ast.literal_eval(raw)
 path = sys.argv[2]
 if path not in items:
     items.append(path)
