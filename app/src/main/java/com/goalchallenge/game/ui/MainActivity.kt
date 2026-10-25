@@ -53,49 +53,57 @@ class MainActivity : Activity() {
 
     private fun buildHome(): View {
         val root = FrameLayout(this).apply {
-            setBackgroundColor(navy)
+            background = verticalGradient(Color.rgb(7, 20, 42), Color.rgb(20, 52, 79))
             applySystemBarInsets(this)
         }
         val scroll = ScrollView(this).apply { isFillViewport = true; clipToPadding = false }
         val column = LinearLayout(this).apply {
             orientation = LinearLayout.VERTICAL
             gravity = Gravity.CENTER_HORIZONTAL
-            setPadding(dp(24), dp(28), dp(24), dp(72))
+            setPadding(dp(20), dp(18), dp(20), dp(64))
         }
         scroll.addView(column, ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT))
         root.addView(scroll, FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT))
 
-        column.addView(text("⚽", 32f, Color.WHITE, true).apply { gravity = Gravity.CENTER })
-        column.addView(space(4))
+        column.addView(text("⚽", 34f, Color.WHITE, true).apply {
+            gravity = Gravity.CENTER
+            setShadowLayer(dp(12).toFloat(), 0f, dp(3).toFloat(), Color.rgb(0, 184, 218))
+        })
+        column.addView(space(2))
         val banner = text(Branding.APP_TITLE, 23f, Color.WHITE, true).apply {
             gravity = Gravity.CENTER
-            setPadding(dp(12), dp(1), dp(12), dp(1))
-            background = solid(orange, 0)
+            letterSpacing = 0.08f
+            setPadding(dp(16), dp(3), dp(16), dp(3))
+            background = pillGradient(Color.rgb(255, 154, 38), Color.rgb(238, 59, 26), Color.rgb(255, 205, 92))
+            elevation = dp(7).toFloat()
+            setShadowLayer(dp(8).toFloat(), 0f, dp(3).toFloat(), Color.rgb(255, 92, 27))
         }
-        column.addView(banner, LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, dp(29)))
-        column.addView(space(42))
+        column.addView(banner, LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, dp(36)))
+        column.addView(space(24))
 
-        val cards = LinearLayout(this).apply { orientation = LinearLayout.HORIZONTAL; gravity = Gravity.CENTER }
+        val cards = LinearLayout(this).apply {
+            orientation = LinearLayout.HORIZONTAL
+            gravity = Gravity.CENTER
+            clipChildren = false
+            clipToPadding = false
+        }
         cards.addView(
-    playerCard(redPlayerName, "RED BALL", red, true),
-    LinearLayout.LayoutParams(0, dp(194), 1f).apply {
-        marginEnd = dp(10)
-    }
-)
+            playerCard(redPlayerName, "RED BALL", red, true),
+            LinearLayout.LayoutParams(0, dp(184), 1f).apply { marginEnd = dp(9) }
+        )
+        cards.addView(
+            playerCard(bluePlayerName, "BLUE BALL", cyan, false),
+            LinearLayout.LayoutParams(0, dp(184), 1f)
+        )
+        column.addView(cards, LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, dp(184)))
 
-cards.addView(
-    playerCard(bluePlayerName, "BLUE BALL", cyan, false),
-    LinearLayout.LayoutParams(0, dp(194), 1f)
-)
-        column.addView(cards, LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, dp(194)))
-
-        column.addView(space(42))
+        column.addView(space(24))
         column.addView(menuButton("🎮  PLAY GAME") {
             startActivity(Intent(this, GameActivity::class.java))
         })
-        column.addView(space(11))
+        column.addView(space(10))
         column.addView(menuButton("♟  PLAYERS") { selectingRedPlayer = true; showPlayers() })
-        column.addView(space(11))
+        column.addView(space(10))
         column.addView(menuButton("⚙  SETTINGS") { showSettings() })
 
         val info = TextView(this).apply {
@@ -104,24 +112,27 @@ cards.addView(
             gravity = Gravity.CENTER
             typeface = Typeface.DEFAULT_BOLD
             setTextColor(navy)
-            background = solid(Color.WHITE, 100)
+            background = pillGradient(Color.WHITE, Color.rgb(208, 239, 255), Color.rgb(137, 214, 255))
+            elevation = dp(6).toFloat()
             setOnClickListener { showHowToPlay() }
             contentDescription = "How to play"
         }
-        val infoParams = FrameLayout.LayoutParams(dp(38), dp(38), Gravity.BOTTOM or Gravity.END).apply {
+        root.addView(info, FrameLayout.LayoutParams(dp(38), dp(38), Gravity.BOTTOM or Gravity.END).apply {
             setMargins(0, 0, dp(12), dp(12))
-        }
-        root.addView(info, infoParams)
+        })
         return root
     }
 
-    /** Home player card: tap it to choose a different player. */
+    /** Compact, layered player cards for the home screen. */
     private fun playerCard(name: String, subtitle: String, accent: Int, isRonaldo: Boolean): View {
+        val darkAccent = if (isRonaldo) Color.rgb(9, 51, 48) else Color.rgb(5, 52, 83)
+        val brightAccent = if (isRonaldo) Color.rgb(13, 126, 78) else Color.rgb(0, 145, 191)
         val card = LinearLayout(this).apply {
             orientation = LinearLayout.VERTICAL
             gravity = Gravity.CENTER
-            setPadding(dp(8), dp(10), dp(8), dp(8))
-            background = rounded(navy, accent, 28f, 2)
+            setPadding(dp(7), dp(7), dp(7), dp(7))
+            background = layeredCard(darkAccent, brightAccent, accent)
+            elevation = dp(8).toFloat()
             isClickable = true
             isFocusable = true
             contentDescription = "Choose player for ${if (isRonaldo) "Red" else "Blue"}: $name"
@@ -131,7 +142,8 @@ cards.addView(
             }
         }
         val imageFrame = FrameLayout(this).apply {
-            background = rounded(if (isRonaldo) Color.rgb(9, 91, 55) else Color.rgb(0, 170, 202), Color.TRANSPARENT, 28f, 0)
+            background = imageStageGradient(isRonaldo)
+            elevation = dp(2).toFloat()
             clipToPadding = true
             clipChildren = true
             val imageId = playerImageResource(name)
@@ -143,10 +155,19 @@ cards.addView(
                 }, FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT))
             }
         }
-        card.addView(imageFrame, LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, dp(88)))
-        card.addView(space(8))
-        card.addView(text(name, 16f, Color.WHITE, true).apply { gravity = Gravity.CENTER; maxLines = 2 })
-        card.addView(text(subtitle, 11f, Color.WHITE, false).apply { gravity = Gravity.CENTER })
+        card.addView(imageFrame, LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, dp(90)))
+        card.addView(space(5))
+        card.addView(text(name, 14f, Color.WHITE, true).apply {
+            gravity = Gravity.CENTER
+            maxLines = 2
+            setShadowLayer(dp(3).toFloat(), 0f, dp(1).toFloat(), Color.BLACK)
+        })
+        card.addView(text(subtitle, 10f, Color.WHITE, true).apply {
+            gravity = Gravity.CENTER
+            letterSpacing = 0.12f
+            setPadding(dp(8), dp(3), dp(8), dp(3))
+            background = pillGradient(accent, darken(accent, 0.55f), lighten(accent, 0.25f))
+        }, LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, dp(22)).apply { topMargin = dp(4) })
         return card
     }
 
@@ -368,16 +389,59 @@ cards.addView(
 
     private fun menuButton(label: String, onClick: () -> Unit): View = Button(this).apply {
         text = label
-        textSize = 21f
+        textSize = 20f
         setTextColor(Color.WHITE)
         typeface = Typeface.create("sans-serif-condensed", Typeface.BOLD)
         isAllCaps = false
         gravity = Gravity.CENTER
-        background = rounded(orange, Color.TRANSPARENT, 6f, 0)
+        letterSpacing = 0.035f
+        background = pillGradient(Color.rgb(255, 157, 40), Color.rgb(231, 58, 28), Color.rgb(255, 205, 92))
+        elevation = dp(7).toFloat()
+        setShadowLayer(dp(5).toFloat(), 0f, dp(3).toFloat(), Color.rgb(0, 0, 0))
+        setPadding(dp(12), 0, dp(12), 0)
         setOnClickListener { onClick() }
-        minHeight = dp(48)
+        minHeight = dp(50)
         stateListAnimator = null
-    }.also { it.layoutParams = LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, dp(48)) }
+    }.also { it.layoutParams = LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, dp(50)) }
+
+    private fun verticalGradient(top: Int, bottom: Int) = GradientDrawable(
+        GradientDrawable.Orientation.TOP_BOTTOM, intArrayOf(top, bottom)
+    ).apply { cornerRadius = dp(18).toFloat() }
+
+    private fun pillGradient(top: Int, bottom: Int, edge: Int) = GradientDrawable(
+        GradientDrawable.Orientation.TOP_BOTTOM, intArrayOf(top, bottom)
+    ).apply {
+        cornerRadius = dp(14).toFloat()
+        setStroke(dp(1), edge)
+    }
+
+    private fun layeredCard(dark: Int, bright: Int, edge: Int) = GradientDrawable(
+        GradientDrawable.Orientation.TL_BR, intArrayOf(bright, dark, Color.rgb(5, 18, 34))
+    ).apply {
+        cornerRadius = dp(18).toFloat()
+        setStroke(dp(2), edge)
+    }
+
+    private fun imageStageGradient(isRedPlayer: Boolean) = GradientDrawable(
+        GradientDrawable.Orientation.TL_BR,
+        if (isRedPlayer) intArrayOf(Color.rgb(24, 178, 105), Color.rgb(6, 50, 50), Color.rgb(3, 20, 36))
+        else intArrayOf(Color.rgb(0, 204, 245), Color.rgb(0, 84, 132), Color.rgb(3, 20, 36))
+    ).apply {
+        cornerRadius = dp(13).toFloat()
+        setStroke(dp(1), if (isRedPlayer) Color.rgb(104, 255, 177) else Color.rgb(112, 238, 255))
+    }
+
+    private fun darken(color: Int, factor: Float): Int = Color.rgb(
+        (Color.red(color) * factor).toInt().coerceIn(0, 255),
+        (Color.green(color) * factor).toInt().coerceIn(0, 255),
+        (Color.blue(color) * factor).toInt().coerceIn(0, 255)
+    )
+
+    private fun lighten(color: Int, factor: Float): Int = Color.rgb(
+        (Color.red(color) + (255 - Color.red(color)) * factor).toInt().coerceIn(0, 255),
+        (Color.green(color) + (255 - Color.green(color)) * factor).toInt().coerceIn(0, 255),
+        (Color.blue(color) + (255 - Color.blue(color)) * factor).toInt().coerceIn(0, 255)
+    )
 
     private fun text(value: String, size: Float, color: Int, bold: Boolean) = TextView(this).apply {
         text = value
