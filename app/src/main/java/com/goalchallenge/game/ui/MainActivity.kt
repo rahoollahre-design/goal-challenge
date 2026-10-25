@@ -53,33 +53,62 @@ class MainActivity : Activity() {
 
     private fun buildHome(): View {
         val root = FrameLayout(this).apply {
-            background = GradientDrawable(GradientDrawable.Orientation.TL_BR, intArrayOf(Color.rgb(4, 10, 24), Color.rgb(10, 31, 55), Color.rgb(5, 15, 31)))
+            background = GradientDrawable(
+                GradientDrawable.Orientation.TL_BR,
+                intArrayOf(Color.rgb(2, 9, 35), Color.rgb(5, 37, 91), Color.rgb(1, 11, 31))
+            )
             applySystemBarInsets(this)
         }
-        val scroll = ScrollView(this).apply { isFillViewport = true; clipToPadding = false }
+
+        // Blue stadium-style glow behind the interactive home controls.
+        val glow = View(this).apply {
+            background = GradientDrawable(
+                GradientDrawable.Orientation.TOP_BOTTOM,
+                intArrayOf(Color.rgb(10, 88, 180), Color.rgb(5, 27, 68), Color.rgb(2, 10, 27))
+            ).apply { cornerRadius = dp(28).toFloat() }
+            alpha = 0.62f
+        }
+        root.addView(glow, FrameLayout.LayoutParams(
+            ViewGroup.LayoutParams.MATCH_PARENT, dp(300), Gravity.TOP
+        ))
+
+        val scroll = ScrollView(this).apply {
+            isFillViewport = true
+            clipToPadding = false
+            overScrollMode = View.OVER_SCROLL_NEVER
+        }
         val column = LinearLayout(this).apply {
             orientation = LinearLayout.VERTICAL
             gravity = Gravity.CENTER_HORIZONTAL
-            setPadding(dp(20), dp(18), dp(20), dp(64))
+            setPadding(dp(16), dp(12), dp(16), dp(22))
         }
-        scroll.addView(column, ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT))
-        root.addView(scroll, FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT))
+        scroll.addView(column, ViewGroup.LayoutParams(
+            ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT
+        ))
+        root.addView(scroll, FrameLayout.LayoutParams(
+            ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT
+        ))
 
-        column.addView(text("⚽", 34f, Color.WHITE, true).apply {
+        column.addView(text("👑", 31f, Color.rgb(255, 210, 44), true).apply {
             gravity = Gravity.CENTER
-            setShadowLayer(dp(12).toFloat(), 0f, dp(3).toFloat(), Color.rgb(0, 184, 218))
+            setShadowLayer(dp(12).toFloat(), 0f, dp(2).toFloat(), Color.rgb(0, 184, 255))
         })
-        column.addView(space(2))
-        val banner = text(Branding.APP_TITLE, 23f, Color.WHITE, true).apply {
+        val banner = text("GOAL", 39f, Color.rgb(255, 207, 32), true).apply {
             gravity = Gravity.CENTER
-            letterSpacing = 0.08f
-            setPadding(dp(16), dp(3), dp(16), dp(3))
-            background = neonPill(Color.rgb(0, 125, 174), Color.rgb(0, 224, 255))
-            elevation = dp(7).toFloat()
-            setShadowLayer(dp(8).toFloat(), 0f, 0f, Color.rgb(0, 183, 255))
+            letterSpacing = 0.05f
+            setShadowLayer(dp(3).toFloat(), dp(2).toFloat(), dp(3).toFloat(), Color.rgb(180, 50, 0))
         }
-        column.addView(banner, LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, dp(36)))
-        column.addView(space(24))
+        column.addView(banner, LinearLayout.LayoutParams(
+            ViewGroup.LayoutParams.MATCH_PARENT, dp(46)
+        ))
+        column.addView(text("C H A L L E N G E", 19f, Color.WHITE, true).apply {
+            gravity = Gravity.CENTER
+            letterSpacing = 0.06f
+            background = neonPill(Color.rgb(11, 47, 103), Color.rgb(0, 196, 255))
+            setPadding(dp(16), dp(4), dp(16), dp(4))
+            elevation = dp(5).toFloat()
+        }, LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, dp(36)))
+        column.addView(space(15))
 
         val cards = LinearLayout(this).apply {
             orientation = LinearLayout.HORIZONTAL
@@ -88,37 +117,66 @@ class MainActivity : Activity() {
             clipToPadding = false
         }
         cards.addView(
-            playerCard(redPlayerName, "RED BALL", red, true),
-            LinearLayout.LayoutParams(0, dp(184), 1f).apply { marginEnd = dp(9) }
+            playerCard(bluePlayerName, "PLAYER 1", cyan, false),
+            LinearLayout.LayoutParams(0, dp(220), 1f).apply { marginEnd = dp(9) }
         )
         cards.addView(
-            playerCard(bluePlayerName, "BLUE BALL", cyan, false),
-            LinearLayout.LayoutParams(0, dp(184), 1f)
+            playerCard(redPlayerName, "PLAYER 2", red, true),
+            LinearLayout.LayoutParams(0, dp(220), 1f).apply { marginStart = dp(9) }
         )
-        column.addView(cards, LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, dp(184)))
+        column.addView(cards, LinearLayout.LayoutParams(
+            ViewGroup.LayoutParams.MATCH_PARENT, dp(220)
+        ))
+        column.addView(text("⚡  V S  ⚡", 18f, Color.rgb(255, 199, 32), true).apply {
+            gravity = Gravity.CENTER
+            setShadowLayer(dp(6).toFloat(), 0f, 0f, Color.rgb(255, 80, 0))
+        }, LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, dp(27)))
 
-        column.addView(space(24))
-        column.addView(menuButton("🎮  PLAY GAME") {
+        column.addView(space(13))
+        column.addView(menuButton("▶   PLAY GAME") {
             startActivity(Intent(this, GameActivity::class.java))
-        })
-        column.addView(space(10))
-        column.addView(menuButton("♟  PLAYERS") { selectingRedPlayer = true; showPlayers() })
-        column.addView(space(10))
-        column.addView(menuButton("⚙  SETTINGS") { showSettings() })
+        }.apply {
+            textSize = 25f
+            background = neonPill(Color.rgb(21, 224, 45), Color.rgb(181, 255, 94))
+            setTextColor(Color.WHITE)
+            setShadowLayer(dp(7).toFloat(), 0f, dp(2).toFloat(), Color.rgb(0, 255, 55))
+        }, LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, dp(68)))
+        column.addView(space(12))
+
+        val secondary = LinearLayout(this).apply {
+            orientation = LinearLayout.HORIZONTAL
+            gravity = Gravity.CENTER
+        }
+        secondary.addView(menuButton("♟  PLAYERS") {
+            selectingRedPlayer = true
+            showPlayers()
+        }.apply {
+            textSize = 17f
+            background = neonPill(Color.rgb(0, 111, 255), Color.rgb(91, 224, 255))
+        }, LinearLayout.LayoutParams(0, dp(58), 1f).apply { marginEnd = dp(6) })
+        secondary.addView(menuButton("⚙  SETTINGS") {
+            showSettings()
+        }.apply {
+            textSize = 17f
+            background = neonPill(Color.rgb(15, 37, 76), Color.rgb(0, 196, 255))
+        }, LinearLayout.LayoutParams(0, dp(58), 1f).apply { marginStart = dp(6) })
+        column.addView(secondary, LinearLayout.LayoutParams(
+            ViewGroup.LayoutParams.MATCH_PARENT, dp(58)
+        ))
 
         val info = TextView(this).apply {
-            text = "i"
-            textSize = 24f
+            text = "?"
+            textSize = 20f
             gravity = Gravity.CENTER
             typeface = Typeface.DEFAULT_BOLD
-            setTextColor(navy)
-            background = pillGradient(Color.WHITE, Color.rgb(208, 239, 255), Color.rgb(137, 214, 255))
+            setTextColor(Color.WHITE)
+            background = neonPill(Color.rgb(0, 79, 143), Color.rgb(0, 220, 255))
             elevation = dp(6).toFloat()
             setOnClickListener { showHowToPlay() }
             contentDescription = "How to play"
         }
-        root.addView(info, FrameLayout.LayoutParams(dp(38), dp(38), Gravity.BOTTOM or Gravity.END).apply {
-            setMargins(0, 0, dp(12), dp(12))
+        root.addView(info, FrameLayout.LayoutParams(dp(36), dp(36), Gravity.BOTTOM or Gravity.END).apply {
+            setMargins(0, 0, dp(10), dp(10))
         })
         return root
     }
@@ -156,11 +214,12 @@ class MainActivity : Activity() {
                 }, FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT))
             }
         }
-        card.addView(imageFrame, LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, dp(90)))
+        card.addView(imageFrame, LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, dp(126)))
         card.addView(space(5))
-        card.addView(text(name, 14f, Color.WHITE, true).apply {
+        card.addView(text(name, 13f, Color.WHITE, true).apply {
             gravity = Gravity.CENTER
-            maxLines = 2
+            maxLines = 1
+            ellipsize = android.text.TextUtils.TruncateAt.END
             setShadowLayer(dp(3).toFloat(), 0f, dp(1).toFloat(), Color.BLACK)
         })
         card.addView(text(subtitle, 10f, Color.WHITE, true).apply {
