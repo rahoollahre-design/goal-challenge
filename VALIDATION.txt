@@ -1,0 +1,39 @@
+GoalChallenge validation summary
+================================
+
+PACKAGE / STRUCTURE
+PASS - rootProject.name = GoalChallenge.
+PASS - app namespace = com.goalchallenge.game.
+PASS - app applicationId = com.goalchallenge.game.
+PASS - debug applicationId becomes com.goalchallenge.game.debug only for debug builds.
+PASS - every Kotlin package declaration matches its physical source directory.
+PASS - game-core main/test packages use com.goalchallenge.game.core.
+PASS - no legacy package, brand, or misspelled project-name references remain in text project files.
+PASS - app display name = Goal Challenge.
+
+SOURCE / RESOURCE CHECKS
+PASS - game-core Kotlin sources compile locally with kotlinc after the package migration.
+PASS - deterministic core smoke simulation produced a valid score (seed 11).
+PASS - Android manifest and all Android XML resources are well-formed.
+PASS - all PNG resources have valid PNG signatures.
+PASS - all WAV resources decode as 44.1 kHz mono PCM.
+PASS - source imports resolve consistently by package/path inspection.
+
+BUILD CONFIGURATION
+- Android Gradle Plugin 9.4.0
+- Gradle 9.6.0 bootstrap
+- compileSdk 36
+- targetSdk 36
+- minSdk 24
+- Java 17 bytecode target
+- no INTERNET permission
+
+ENVIRONMENT LIMITATION
+A complete Android SDK/AGP assembleDebug could not be executed in this sandbox because the Android SDK is not installed and outbound Gradle distribution download is unavailable here. The pure Kotlin game-core compile and static Android project validation passed.
+
+WINDOWS / ANDROID STUDIO NEXT CHECK
+1. Open the goalchallenge folder in Android Studio.
+2. Let Gradle sync with internet access.
+3. Run BUILD_DEBUG.bat or: gradlew.bat :game-core:test :app:assembleDebug
+4. Install app-debug.apk on a device/emulator and verify audio/TTS, immersive UI, pause/resume and scoring.
+5. Configure your private release signing key only when preparing the Play release.

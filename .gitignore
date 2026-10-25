@@ -1,0 +1,15 @@
+.gradle/
+.kotlin/
+.idea/
+**/build/
+local.properties
+*.iml
+*.apk
+*.aab
+*.jks
+*.keystore
+*.hprof
+*.log
+*.backup*
+**/MainActivity_before_splash.kt.txt
+.DS_Store
